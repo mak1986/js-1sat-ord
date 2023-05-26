@@ -107,9 +107,11 @@ const createOrdinals = async (
   if (idKey) {
     // input txids are available so sigma signature
     // can be final before signing the tx
-    const sigma = new Sigma(tx);
-    const { signedTx } = sigma.sign(idKey);
-    tx = signedTx;
+    for (let i = 0; i < inscriptionScripts.length; i++) {
+      const sigma = new Sigma(tx, i);
+      const { signedTx } = sigma.sign(idKey);
+      tx = signedTx;
+    }
   }
 
   const sig = tx.sign(
