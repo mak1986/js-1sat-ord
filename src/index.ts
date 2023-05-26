@@ -96,7 +96,7 @@ const createOrdinals = async (
   const fee = Math.ceil(
     satPerByteFee * (tx.get_size() + emptyOut.to_bytes().byteLength)
   );
-  const change = utxo.satoshis - 1 - fee;
+  const change = utxo.satoshis - inscriptionScripts.length - fee;
   if (change < 0) throw new Error("Inadequate satoshis for fee");
   if (change > 0) {
     let changeOut = new TxOut(BigInt(change), changeScript);
