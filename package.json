@@ -14,7 +14,7 @@
     "build": "yarn clean && microbundle",
     "clean": "rimraf -rf dist",
     "test": "jest",
-    "prepare": "SET NODE_OPTIONS=--openssl-legacy-provider"
+    "prepare": "NODE_OPTIONS=--openssl-legacy-provider"
   },
   "keywords": [],
   "author": "Luke Rohenaz",
