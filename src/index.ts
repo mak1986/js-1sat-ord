@@ -63,14 +63,12 @@ const buildInscription = (
   return Script.from_asm_string(inscriptionAsm);
 };
 
-const createOrdinal = async (
+const createOrdinals = async (
   utxo: Utxo,
-  destinationAddress: string,
   paymentPk: PrivateKey,
   changeAddress: string,
   satPerByteFee: number,
-  inscription: Inscription,
-  metaData?: MAP,
+  inscriptionScripts: Script[],
   idKey?: PrivateKey
 ): Promise<Transaction> => {
   let tx = new Transaction(1, 0);
@@ -85,15 +83,11 @@ const createOrdinal = async (
   tx.add_input(utxoIn);
 
   // Outputs
-  const inscriptionScript = buildInscription(
-    P2PKHAddress.from_string(destinationAddress),
-    inscription.dataB64,
-    inscription.contentType,
-    metaData
-  );
 
-  let satOut = new TxOut(BigInt(1), inscriptionScript);
-  tx.add_output(satOut);
+  for (let i = 0; i < inscriptionScripts.length; i++) {
+    let satOut = new TxOut(BigInt(1), inscriptionScripts[i]);
+    tx.add_output(satOut);
+  }
 
   // add change
   const changeaddr = P2PKHAddress.from_string(changeAddress);
@@ -135,6 +129,28 @@ const createOrdinal = async (
   tx.set_input(0, utxoIn);
 
   return tx;
+}
+
+const createOrdinal = async (
+  utxo: Utxo,
+  destinationAddress: string,
+  paymentPk: PrivateKey,
+  changeAddress: string,
+  satPerByteFee: number,
+  inscription: Inscription,
+  metaData?: MAP,
+  idKey?: PrivateKey
+): Promise<Transaction> => {
+
+  // Output
+  const inscriptionScript = buildInscription(
+    P2PKHAddress.from_string(destinationAddress),
+    inscription.dataB64,
+    inscription.contentType,
+    metaData
+  );
+
+  return createOrdinals(utxo, paymentPk, changeAddress, satPerByteFee, [inscriptionScript], idKey)
 };
 
 const sendOrdinal = async (
@@ -280,4 +296,4 @@ const sendUtxos = async (
   return tx;
 };
 
-export { buildInscription, createOrdinal, sendOrdinal, sendUtxos };
+export { buildInscription, createOrdinals, createOrdinal, sendOrdinal, sendUtxos };
