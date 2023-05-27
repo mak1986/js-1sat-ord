@@ -28,6 +28,7 @@ export type Inscription = {
 };
 
 const MAP_PREFIX = "1PuQa7K62MiKCtssSLKy1kh56WWU7MtUR5";
+const SIGNATURE_SIZE = 72 // ECDSA signature is typically 70-72 bytes in size.
 
 const buildInscription = (
   destinationAddress: P2PKHAddress,
@@ -94,7 +95,7 @@ const createOrdinals = async (
   const changeScript = changeaddr.get_locking_script();
   let emptyOut = new TxOut(BigInt(1), changeScript);
   const fee = Math.ceil(
-    satPerByteFee * (tx.get_size() + emptyOut.to_bytes().byteLength)
+    satPerByteFee * (tx.get_size() + emptyOut.to_bytes().byteLength + (SIGNATURE_SIZE * 2))
   );
   const change = utxo.satoshis - inscriptionScripts.length - fee;
   if (change < 0) throw new Error("Inadequate satoshis for fee");
@@ -204,7 +205,7 @@ const sendOrdinal = async (
   const changeScript = changeaddr.get_locking_script();
   let emptyOut = new TxOut(BigInt(1), changeScript);
   const fee = Math.ceil(
-    satPerByteFee * (tx.get_size() + emptyOut.to_bytes().byteLength)
+    satPerByteFee * (tx.get_size() + emptyOut.to_bytes().byteLength + (SIGNATURE_SIZE * 2))
   );
   const change = paymentUtxo.satoshis - fee;
   let changeOut = new TxOut(BigInt(change), changeScript);
